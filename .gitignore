@@ -30,6 +30,10 @@ tmp/
 *.log
 logs/
 
+# Test artifacts
+test-results/
+playwright-report/
+
 # OS and editors
 .DS_Store
 Thumbs.db

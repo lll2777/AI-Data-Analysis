@@ -5,13 +5,19 @@ export async function apiFetch<T>(
   init?: RequestInit,
 ): Promise<T> {
   const { apiUrl } = getPublicEnv();
-  const response = await fetch(`${apiUrl}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
-  });
+  const url = `${apiUrl}${path}`;
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...init?.headers,
+      },
+    });
+  } catch (error) {
+    throw new Error(describeNetworkError({ apiUrl, error }));
+  }
 
   if (!response.ok) {
     const detail = await readErrorDetail(response);
@@ -20,6 +26,31 @@ export async function apiFetch<T>(
   }
 
   return response.json() as Promise<T>;
+}
+
+export function describeNetworkError({
+  apiUrl,
+  error,
+}: {
+  apiUrl: string;
+  error: unknown;
+}) {
+  const detail = error instanceof Error ? error.message : String(error);
+  const localApi = apiUrl.includes("localhost") || apiUrl.includes("127.0.0.1");
+  if (localApi) {
+    return [
+      "无法连接本地后端服务。",
+      "请确认 FastAPI 已启动，并检查前端地址与后端 CORS 配置是否匹配。",
+      `API: ${apiUrl}`,
+      `错误: ${detail}`,
+    ].join(" ");
+  }
+  return [
+    "网络请求失败。",
+    "请检查网络连接、API 地址或服务端跨域配置。",
+    `API: ${apiUrl}`,
+    `错误: ${detail}`,
+  ].join(" ");
 }
 
 function statusMessage(status: number) {

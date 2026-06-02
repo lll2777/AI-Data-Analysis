@@ -98,8 +98,15 @@ conda run -n pytorch python scripts/apply_supabase_storage_policies.py
 npm run format:check
 npm run lint
 npm run build
+npm run e2e
 conda run -n pytorch python -m compileall apps/api/app scripts
 ```
+
+`npm run e2e` expects the frontend dev server to already be running at
+`http://127.0.0.1:3000`. Override with `PLAYWRIGHT_BASE_URL` when testing another
+environment. This workstation uses the installed Chrome browser through
+Playwright's `channel: "chrome"` setting, so no Playwright browser download is
+required for the smoke suite.
 
 ## Deployment
 

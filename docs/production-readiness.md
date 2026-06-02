@@ -36,8 +36,14 @@ conda run -n pytorch python scripts/apply_supabase_storage_policies.py
 npm run format:check
 npm run lint
 npm run build
+npm run e2e
 conda run -n pytorch python -m compileall apps/api/app scripts
 ```
+
+The Playwright smoke suite uses the root `playwright.config.ts` and defaults to
+`http://127.0.0.1:3000`. Start the frontend before running `npm run e2e`, or set
+`PLAYWRIGHT_BASE_URL` to a deployed frontend URL. The local configuration uses
+the installed Chrome channel to avoid downloading browser binaries.
 
 ## Manual End-to-End Checklist
 
@@ -61,6 +67,8 @@ conda run -n pytorch python -m compileall apps/api/app scripts
 - Add backend unit tests for repositories and services.
 - Add frontend component tests for upload, charts, insights, jobs, and agent panels.
 - Add Playwright E2E with seeded Supabase test credentials.
+- Extend Playwright E2E beyond public smoke coverage to a seeded Supabase upload,
+  AI Q&A, and Agent workflow.
 - Add request IDs and structured JSON logs.
 - Add rate limits on upload, AI, and agent endpoints.
 - Add billing, RBAC, share links, and audit logs from the roadmap.
