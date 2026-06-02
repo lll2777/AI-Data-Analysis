@@ -28,7 +28,7 @@ analysis results for sharing.
 - `docs`: architecture, delivery steps, deployment, and production runbooks.
 
 AI calls are routed through `aiService`. Business code must not call model vendor
-APIs directly. The default provider is Mimo with `mimo-v2-flash`, and the provider
+APIs directly. The default provider is Mimo with `mimo-v2.5`, and the provider
 boundary is ready for OpenAI, DeepSeek, Qwen, and Claude adapters.
 
 ## Quick Start
@@ -61,6 +61,29 @@ Run the frontend:
 
 ```powershell
 npm run dev
+```
+
+Open the local app at:
+
+- Frontend: [http://127.0.0.1:3000](http://127.0.0.1:3000)
+- API health check: [http://127.0.0.1:8000/api/v1/health](http://127.0.0.1:8000/api/v1/health)
+
+Local development servers stop when the machine shuts down or restarts. Start the
+backend and frontend again before testing after a reboot.
+
+On this workstation, the same services can be started from PowerShell with:
+
+```powershell
+$env:PATH = "D:\codex_project\tools\node-v24.16.0-win-x64;" + $env:PATH
+$env:NPM_CONFIG_CACHE = "D:\codex_project\cache\npm"
+
+Start-Process -FilePath "D:\conda_envs\pytorch\python.exe" `
+  -ArgumentList @("-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8000") `
+  -WorkingDirectory "D:\codex_project\git\apps\api"
+
+Start-Process -FilePath "D:\codex_project\tools\node-v24.16.0-win-x64\npm.cmd" `
+  -ArgumentList @("--cache", "D:\codex_project\cache\npm", "run", "dev") `
+  -WorkingDirectory "D:\codex_project\git"
 ```
 
 Use `samples/sales-demo.csv` for the first manual upload test.

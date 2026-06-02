@@ -325,6 +325,10 @@
   - Local testing found that `.env` starts with a UTF-8 BOM. `scripts/check_env.py`
     now reads env files with `utf-8-sig`, and `scripts/test_check_env.py` covers
     BOM-compatible parsing.
+  - User saw `http://127.0.0.1:3000` become inaccessible after the machine had
+    been shut down/restarted. Root cause: local Next.js and FastAPI development
+    servers are process-based and do not auto-start after reboot. README now
+    documents the local app URLs and PowerShell commands to restart both services.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 
