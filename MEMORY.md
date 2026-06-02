@@ -329,6 +329,12 @@
     been shut down/restarted. Root cause: local Next.js and FastAPI development
     servers are process-based and do not auto-start after reboot. README now
     documents the local app URLs and PowerShell commands to restart both services.
+  - User reported login/register appearing unresponsive on `http://127.0.0.1:3000`.
+    Root cause: Next.js dev server was blocking `127.0.0.1` as a development
+    origin, so the login form could fall back to non-React browser behavior.
+    `apps/web/next.config.ts` now includes `allowedDevOrigins: ["127.0.0.1"]`.
+    After restarting the frontend, fake invalid credentials produced the expected
+    `Invalid login credentials` toast on `127.0.0.1`.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 
