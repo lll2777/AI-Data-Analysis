@@ -341,6 +341,15 @@
     `http://localhost:3000`. Preflight from `http://127.0.0.1:3000` to
     `/api/v1/datasets/upload-session` returned BadRequest before the fix and 200
     after adding `http://127.0.0.1:3000` to the default CORS origins.
+  - User saw AI Q&A render raw MiMo XML-style `<tool_call>` content and Agent
+    `prepare_dashboard` fail at `generate_insights`. Root causes:
+    - MiMo can return XML-style tool calls in `content` instead of OpenAI
+      `tool_calls`; dataset Q&A now extracts those calls, executes the controlled
+      local context tool path, and asks for a Chinese final answer instead of
+      storing raw tool markup.
+    - AI insight generation treated transient provider HTTP failures as fatal.
+      It now returns a warning AI insight while preserving deterministic insights
+      so the Agent workflow can continue to save the dashboard.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 

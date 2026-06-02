@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Any
 
 import httpx
@@ -133,10 +134,11 @@ class DatasetQuestionService:
                     "dataset_id": profile.dataset.id,
                 },
             )
-            if ai_result.get("content"):
-                return ai_result
-
             tool_calls = ai_result.get("tool_calls") or []
+            xml_tool_calls = extract_mimo_xml_tool_calls(ai_result.get("content") or "")
+            if xml_tool_calls:
+                tool_calls = xml_tool_calls
+
             if not tool_calls:
                 return ai_result
 
@@ -192,6 +194,8 @@ def build_messages(
                 "只能基于提供的数据集上下文回答，不要编造列名、行数据或事实。"
                 "回答必须使用中文，保持简洁，并在不确定时说明不确定。"
                 "有帮助时引用你使用的字段、统计摘要或图表配置。"
+                "如果需要工具，只能使用已提供的 describe_dataset_context 工具；"
+                "不要把 <tool_call> 标签、SQL 或工具调用片段作为最终答案输出。"
             ),
         },
         {
@@ -251,12 +255,58 @@ def parse_tool_arguments(raw_arguments: Any) -> dict[str, Any]:
     return parsed if isinstance(parsed, dict) else {}
 
 
+def extract_mimo_xml_tool_calls(content: str) -> list[dict[str, Any]]:
+    tool_calls: list[dict[str, Any]] = []
+    for index, block in enumerate(re.findall(r"<tool_call>(.*?)</tool_call>", content, re.DOTALL)):
+        function_match = re.search(r"<function=([^>]+)>(.*?)</function>", block, re.DOTALL)
+        if not function_match:
+            continue
+        function_name = function_match.group(1).strip()
+        function_body = function_match.group(2)
+        arguments = {
+            name.strip(): value.strip()
+            for name, value in re.findall(
+                r"<parameter=([^>]+)>(.*?)</parameter>",
+                function_body,
+                re.DOTALL,
+            )
+        }
+        tool_calls.append(
+            {
+                "id": f"mimo_xml_call_{index + 1}",
+                "type": "function",
+                "function": {
+                    "name": function_name,
+                    "arguments": json.dumps(arguments, ensure_ascii=False),
+                },
+            }
+        )
+    return tool_calls
+
+
 def execute_dataset_context_tool(
     *,
     context: dict[str, Any],
     tool_name: str,
     arguments: dict[str, Any],
 ) -> dict[str, Any]:
+    if tool_name == "query":
+        return {
+            "focus": "summary",
+            "requested_sql": arguments.get("sql"),
+            "note": (
+                "Arbitrary SQL execution is not available in this controlled dataset tool. "
+                "Use the supplied dataset context instead."
+            ),
+            "result": {
+                "dataset": context.get("dataset"),
+                "columns": context.get("columns"),
+                "summary": context.get("summary"),
+                "categorical_aggregates": context.get("categorical_aggregates"),
+                "preview_rows": context.get("preview_rows"),
+            },
+        }
+
     if tool_name != "describe_dataset_context":
         return {
             "error": f"Unsupported tool: {tool_name}",

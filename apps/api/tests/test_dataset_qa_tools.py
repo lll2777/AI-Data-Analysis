@@ -1,7 +1,10 @@
 import json
 import unittest
 
-from app.services.ai.dataset_qa import build_tool_followup_messages
+from app.services.ai.dataset_qa import (
+    build_tool_followup_messages,
+    extract_mimo_xml_tool_calls,
+)
 
 
 class DatasetQAToolFollowupTests(unittest.TestCase):
@@ -31,6 +34,23 @@ class DatasetQAToolFollowupTests(unittest.TestCase):
         tool_content = json.loads(messages[1]["content"])
         self.assertEqual(tool_content["focus"], "summary")
         self.assertEqual(tool_content["result"], {"row_count": 3})
+
+    def test_extracts_mimo_xml_tool_call_content(self) -> None:
+        content = """<tool_call>
+<function=query>
+<parameter=sql>SELECT COUNT(*) FROM table</parameter>
+</function>
+</tool_call>"""
+
+        tool_calls = extract_mimo_xml_tool_calls(content)
+
+        self.assertEqual(len(tool_calls), 1)
+        self.assertEqual(tool_calls[0]["type"], "function")
+        self.assertEqual(tool_calls[0]["function"]["name"], "query")
+        self.assertEqual(
+            json.loads(tool_calls[0]["function"]["arguments"]),
+            {"sql": "SELECT COUNT(*) FROM table"},
+        )
 
 
 if __name__ == "__main__":

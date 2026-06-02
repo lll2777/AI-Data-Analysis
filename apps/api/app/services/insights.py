@@ -85,10 +85,7 @@ class InsightService:
                 detail=f"AI provider request failed with status {exc.response.status_code}.",
             ) from exc
         except httpx.HTTPError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="AI provider is temporarily unavailable.",
-            ) from exc
+            return [build_ai_unavailable_insight("AI provider is temporarily unavailable.")]
 
         parsed = parse_ai_insights(result.get("content") or "")
         if not parsed:
@@ -211,6 +208,21 @@ def build_deterministic_insights(
         )
 
     return insights
+
+
+def build_ai_unavailable_insight(message: str) -> dict[str, Any]:
+    return {
+        "title": "AI 洞察暂时不可用",
+        "summary": (
+            f"{message} 已保留确定性分析结果；请稍后重试 AI 洞察生成。"
+        ),
+        "insight_type": "warning",
+        "severity": "low",
+        "evidence": {"capability": "generate_insight", "provider_status": "unavailable"},
+        "provider": "mimo",
+        "model": None,
+        "source": "ai",
+    }
 
 
 def parse_ai_insights(content: str) -> list[dict[str, Any]]:

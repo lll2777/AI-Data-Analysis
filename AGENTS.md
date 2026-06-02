@@ -153,6 +153,12 @@ startup project and a portfolio-grade full-stack system.
   empty content, execute the local dataset-context tool and make a follow-up
   model call before storing the assistant answer. Do not regress to saving the
   English fallback "I could not generate an answer." for valid tool-call flows.
+- MiMo can return XML-style `<tool_call>` content instead of OpenAI-compatible
+  `tool_calls`. Dataset AI Q&A must parse those XML tool calls and produce a
+  normal Chinese final answer instead of storing raw tool markup.
+- AI Agent `prepare_dashboard` should not fail only because live AI insight
+  generation is temporarily unavailable. Preserve deterministic insights and
+  return a warning AI insight so the workflow can continue to dashboard saving.
 - The user has configured the local large-model API key. Upload, parsing,
   deterministic charts, dashboard persistence, AI Q&A, AI insights, and AI Agent
   model-backed behavior can now be tested locally.
