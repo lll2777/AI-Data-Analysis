@@ -335,6 +335,12 @@
     `apps/web/next.config.ts` now includes `allowedDevOrigins: ["127.0.0.1"]`.
     After restarting the frontend, fake invalid credentials produced the expected
     `Invalid login credentials` toast on `127.0.0.1`.
+  - User then saw upload show `Failed to fetch` while using
+    `http://127.0.0.1:3000`. Root cause: frontend API calls target
+    `http://localhost:8000`, but the FastAPI CORS default allowed only
+    `http://localhost:3000`. Preflight from `http://127.0.0.1:3000` to
+    `/api/v1/datasets/upload-session` returned BadRequest before the fix and 200
+    after adding `http://127.0.0.1:3000` to the default CORS origins.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 
