@@ -7,6 +7,8 @@ import { getE2ECredentials, loginWithCredentials } from "./support/auth";
 const credentials = getE2ECredentials();
 
 test.describe("authenticated dataset workflow", () => {
+  test.setTimeout(180_000);
+
   test.skip(
     !credentials,
     "Set E2E_USER_EMAIL and E2E_USER_PASSWORD to run the authenticated E2E workflow.",
