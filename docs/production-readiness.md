@@ -15,6 +15,7 @@
 - Controlled AI Agent workflow.
 - Vercel and Render deployment templates.
 - CI for formatting, linting, backend compile, API smoke, and frontend build.
+- Windows local startup and connectivity checks.
 
 ## What Still Needs Real Credentials
 
@@ -32,6 +33,7 @@
 
 ```bash
 python scripts/check_env.py --file .env --profile development
+npm run test:scripts
 conda run -n pytorch python scripts/smoke_api.py --local-testclient
 conda run -n pytorch python scripts/apply_supabase_storage_policies.py
 npm run format:check
@@ -89,4 +91,4 @@ question, and runs the AI Agent workflow.
   `/share/{token}` rendering.
 - Add structured JSON logs on top of the current request IDs.
 - Add rate limits on upload, AI, and agent endpoints.
-- Add billing, RBAC, share links, and audit logs from the roadmap.
+- Add billing, RBAC, and audit logs from the roadmap.

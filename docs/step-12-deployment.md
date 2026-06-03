@@ -195,7 +195,7 @@ celery -A app.tasks.celery_app.celery_app inspect ping
 Before public launch:
 
 - Add Alembic or another migration manager if schema churn increases.
-- Add structured request IDs.
+- Add structured JSON logs on top of the current request IDs.
 - Add rate limits for upload, AI, and agent endpoints.
 - Add background job retries and dead-letter handling.
 - Add secrets scanning in CI.

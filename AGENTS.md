@@ -181,3 +181,17 @@ startup project and a portfolio-grade full-stack system.
   unavailable.
 - Local `.env` may include a UTF-8 BOM. `scripts/check_env.py` intentionally reads
   env files with `utf-8-sig`; keep that compatibility.
+- Local startup helpers now exist:
+  - `npm run local:start` starts Docker postgres/redis when available, FastAPI on
+    `127.0.0.1:8000`, Next.js on `127.0.0.1:3000`, runs a health check, and opens
+    the frontend.
+  - `npm run local:check` checks frontend, backend, and Supabase Auth
+    connectivity without printing secrets. A Supabase Auth failure means local
+    services may be up while login/upload still fail from external network
+    instability.
+- `npm run test:scripts` runs local tooling script tests and is included in
+  GitHub Actions CI.
+- Deployment checklist lives in `docs/deployment-checklist.md`. Production MiMo
+  defaults in `.env.production.example` and `render.yaml` should stay aligned
+  with `MIMO_BASE_URL=https://token-plan-cn.xiaomimimo.com/v1` and
+  `MIMO_MODEL=mimo-v2.5`.

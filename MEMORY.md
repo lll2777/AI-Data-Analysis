@@ -379,6 +379,16 @@
       without logging in and see the saved dashboard charts and insights. The
       backend exposes private create/revoke endpoints plus a public token lookup,
       and the frontend dashboard rows can generate/copy/revoke links.
+    - Local startup UX was simplified with `scripts/start-local.ps1` and
+      `scripts/check-local.ps1`. `npm run local:start` starts Docker
+      postgres/redis when available plus the FastAPI and Next.js dev servers, and
+      `npm run local:check` separates frontend, backend, and Supabase Auth
+      connectivity failures without exposing secrets.
+    - CI now runs `npm run test:scripts`, covering local tooling tests for env
+      parsing and startup/check script presence. Deployment prep was tightened
+      with `docs/deployment-checklist.md`, and production MiMo defaults in
+      `.env.production.example` plus `render.yaml` were aligned to
+      `https://token-plan-cn.xiaomimimo.com/v1` and `mimo-v2.5`.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 

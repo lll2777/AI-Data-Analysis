@@ -30,11 +30,11 @@ services:
       - key: AI_PROVIDER
         value: mimo
       - key: MIMO_BASE_URL
-        value: https://api.xiaomimimo.com/v1
+        value: https://token-plan-cn.xiaomimimo.com/v1
       - key: MIMO_API_KEY
         sync: false
       - key: MIMO_MODEL
-        value: mimo-v2-flash
+        value: mimo-v2.5
 
   - type: worker
     name: ai-data-analysis-worker
@@ -61,8 +61,8 @@ services:
       - key: AI_PROVIDER
         value: mimo
       - key: MIMO_BASE_URL
-        value: https://api.xiaomimimo.com/v1
+        value: https://token-plan-cn.xiaomimimo.com/v1
       - key: MIMO_API_KEY
         sync: false
       - key: MIMO_MODEL
-        value: mimo-v2-flash
+        value: mimo-v2.5
