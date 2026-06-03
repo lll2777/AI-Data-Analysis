@@ -98,8 +98,29 @@ conda run -n pytorch python scripts/apply_supabase_storage_policies.py
 npm run format:check
 npm run lint
 npm run build
+npm run e2e:smoke
+npm run e2e
+$env:E2E_USER_EMAIL = "test@example.com"
+$env:E2E_USER_PASSWORD = "test-password"
+npm run e2e:auth
 conda run -n pytorch python -m compileall apps/api/app scripts
 ```
+
+`npm run e2e` expects the frontend dev server to already be running at
+`http://127.0.0.1:3000`. Override with `PLAYWRIGHT_BASE_URL` when testing another
+environment. This workstation uses the installed Chrome browser through
+Playwright's `channel: "chrome"` setting, so no Playwright browser download is
+required for the smoke suite.
+
+The authenticated Playwright workflow is optional and is skipped unless
+`E2E_USER_EMAIL` and `E2E_USER_PASSWORD` are set. Use a dedicated Supabase test
+user, not a personal account. The authenticated workflow uploads
+`samples/sales-demo.csv`, verifies parsing, generates charts, asks an AI
+question, and runs the controlled AI Agent.
+
+GitHub Actions runs `npm run e2e:smoke` on pull requests. The workflow sets
+`PLAYWRIGHT_START_SERVER=1`, starts the Next.js dev server automatically, and uses
+Playwright's bundled Chromium on Linux.
 
 ## Deployment
 

@@ -350,6 +350,30 @@
     - AI insight generation treated transient provider HTTP failures as fatal.
       It now returns a warning AI insight while preserving deterministic insights
       so the Agent workflow can continue to save the dashboard.
+  - Production hardening started after local manual testing stabilized:
+    - Added FastAPI request-id middleware. API responses now include
+      `X-Request-ID`, caller-provided request ids are preserved, and request
+      completion logs include method, path, status, duration, and request id.
+    - Frontend API network failures now produce Chinese local/remote network
+      diagnostics instead of raw `Failed to fetch`.
+    - Added root Playwright E2E smoke scaffold using system Chrome. `npm run e2e`
+      covers public shell, login/register navigation, upload shell visibility,
+      and the login form retaining input after invalid credentials.
+    - Added an optional authenticated Playwright E2E workflow gated by
+      `E2E_USER_EMAIL` and `E2E_USER_PASSWORD`. It uses a dedicated test account
+      to log in, upload `samples/sales-demo.csv`, verify parsing, generate charts,
+      ask AI Q&A, and run the controlled AI Agent. Without those credentials the
+      spec skips cleanly so CI/local smoke checks do not fail from missing secrets.
+    - GitHub Actions now runs public Playwright smoke coverage with
+      `npm run e2e:smoke`. CI sets `PLAYWRIGHT_START_SERVER=1`, starts the
+      Next.js dev server automatically, installs bundled Chromium, and keeps the
+      authenticated workflow out of CI until seeded credentials are stored in
+      GitHub Secrets.
+    - Authentication E2E helper now clears the password field immediately after
+      submit so Playwright failure snapshots do not retain E2E passwords. Backend
+      hardening tests now cover profiler boolean/date boundaries, mixed sales
+      chart recommendations, unparseable AI insight fallback, and Agent sync/async
+      tool failure step recording.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 

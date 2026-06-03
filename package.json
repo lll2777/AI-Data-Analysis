@@ -11,6 +11,9 @@
     "dev": "npm run dev --workspace @ai-data-analysis/web",
     "build": "npm run build --workspace @ai-data-analysis/web",
     "lint": "npm run lint --workspace @ai-data-analysis/web",
+    "e2e": "playwright test",
+    "e2e:smoke": "playwright test tests/e2e/auth-and-shell.spec.ts",
+    "e2e:auth": "playwright test tests/e2e/authenticated-workflow.spec.ts",
     "check:env": "python scripts/check_env.py --file .env --profile development",
     "smoke:api": "conda run -n pytorch python scripts/smoke_api.py --local-testclient",
     "storage:policies": "conda run -n pytorch python scripts/apply_supabase_storage_policies.py",
@@ -19,6 +22,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "husky": "^9.1.7",
     "prettier": "^3.7.4"
   }

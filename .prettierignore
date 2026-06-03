@@ -1,0 +1,6 @@
+node_modules/
+.next/
+out/
+tmp/
+test-results/
+playwright-report/
