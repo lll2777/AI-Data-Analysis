@@ -15,6 +15,7 @@ analysis results for sharing.
 - Recommend charts through a deterministic chart service, with Recharts rendering.
 - Ask dataset-grounded AI questions through the provider adapter layer.
 - Generate business insights and save dashboards.
+- Create public read-only dashboard share links.
 - Queue long-running jobs through Redis and Celery.
 - Run a controlled AI Agent workflow that audits every tool step.
 
@@ -133,6 +134,13 @@ See:
 - [docs/step-12-deployment.md](docs/step-12-deployment.md)
 - [docs/production-readiness.md](docs/production-readiness.md)
 - [.env.production.example](.env.production.example)
+
+## Sharing
+
+Saved dashboards can be shared through public read-only links. Apply
+`infra/postgres/010_share_links.sql`, generate a link from the dashboard panel,
+and open `/share/{token}` to view the shared charts and insights without signing
+in.
 
 ## Delivery Docs
 

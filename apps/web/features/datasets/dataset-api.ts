@@ -216,6 +216,25 @@ export type DashboardListResponse = {
   dashboards: DashboardSummary[];
 };
 
+export type ShareLink = {
+  id: string;
+  dashboard_id: string;
+  token: string;
+  status: "active" | "revoked";
+  created_at: string | null;
+  revoked_at: string | null;
+};
+
+export type ShareLinkActionResponse = {
+  share: ShareLink;
+  url: string;
+};
+
+export type PublicShareResponse = {
+  share: ShareLink;
+  dashboard: Dashboard;
+};
+
 export type JobStatus =
   | "queued"
   | "running"
@@ -409,6 +428,36 @@ export async function saveDashboard(params: {
         title: params.title,
         description: params.description,
       }),
+    },
+  );
+}
+
+export async function createDashboardShareLink(params: {
+  accessToken: string;
+  dashboardId: string;
+}) {
+  return apiFetch<ShareLinkActionResponse>(
+    `/api/v1/dashboards/${params.dashboardId}/share-link`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${params.accessToken}`,
+      },
+    },
+  );
+}
+
+export async function revokeDashboardShareLink(params: {
+  accessToken: string;
+  dashboardId: string;
+}) {
+  return apiFetch<ShareLinkActionResponse>(
+    `/api/v1/dashboards/${params.dashboardId}/share-link`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${params.accessToken}`,
+      },
     },
   );
 }

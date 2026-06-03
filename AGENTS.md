@@ -101,6 +101,9 @@ startup project and a portfolio-grade full-stack system.
   live Supabase credentials.
 - STEP 12 deployment configuration and production runbook are implemented and
   locally verified.
+- Public read-only dashboard share links are implemented. Share links create one
+  active token per dashboard, render at `/share/{token}`, and can be revoked by
+  the dashboard owner.
 - Production readiness tooling is being added: GitHub Actions CI, environment
   validation, API smoke checks, sample data, and a top-level README suitable for
   portfolio review.

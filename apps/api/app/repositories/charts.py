@@ -82,3 +82,17 @@ class ChartRepository:
             {"dataset_id": dataset_id, "user_id": user_id},
         ).mappings().all()
         return [ChartResponse(**row) for row in normalize_records(rows)]
+
+    def list_public_for_dataset(self, *, dataset_id: str) -> list[ChartResponse]:
+        rows = self.session.execute(
+            text(
+                """
+                select c.id, c.dataset_id, c.title, c.chart_type, c.config, c.query_spec, c.created_by
+                from charts c
+                where c.dataset_id = :dataset_id
+                order by c.created_at asc
+                """,
+            ),
+            {"dataset_id": dataset_id},
+        ).mappings().all()
+        return [ChartResponse(**row) for row in normalize_records(rows)]

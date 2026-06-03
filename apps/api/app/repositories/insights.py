@@ -125,3 +125,35 @@ class InsightRepository:
             {"dataset_id": dataset_id, "user_id": user_id},
         ).mappings().all()
         return [InsightResponse(**row) for row in normalize_records(rows)]
+
+    def list_public_for_dataset(self, *, dataset_id: str) -> list[InsightResponse]:
+        rows = self.session.execute(
+            text(
+                """
+                select
+                  i.id,
+                  i.dataset_id,
+                  i.title,
+                  i.summary,
+                  i.insight_type,
+                  i.severity,
+                  i.evidence,
+                  i.provider,
+                  i.model,
+                  i.source,
+                  i.created_at::text as created_at
+                from insights i
+                where i.dataset_id = :dataset_id
+                order by
+                  case i.severity
+                    when 'high' then 1
+                    when 'medium' then 2
+                    when 'low' then 3
+                    else 4
+                  end,
+                  i.created_at desc
+                """,
+            ),
+            {"dataset_id": dataset_id},
+        ).mappings().all()
+        return [InsightResponse(**row) for row in normalize_records(rows)]
