@@ -37,6 +37,7 @@ npm run format:check
 npm run lint
 npm run build
 npm run e2e
+E2E_USER_EMAIL="test@example.com" E2E_USER_PASSWORD="test-password" npm run e2e:auth
 conda run -n pytorch python -m compileall apps/api/app scripts
 ```
 
@@ -44,6 +45,12 @@ The Playwright smoke suite uses the root `playwright.config.ts` and defaults to
 `http://127.0.0.1:3000`. Start the frontend before running `npm run e2e`, or set
 `PLAYWRIGHT_BASE_URL` to a deployed frontend URL. The local configuration uses
 the installed Chrome channel to avoid downloading browser binaries.
+
+The authenticated Playwright workflow is skipped unless `E2E_USER_EMAIL` and
+`E2E_USER_PASSWORD` are provided. Use a dedicated Supabase test user and store
+those values in local shell variables or GitHub Secrets. The authenticated suite
+uploads `samples/sales-demo.csv`, waits for parsing, generates charts, asks an AI
+question, and runs the AI Agent workflow.
 
 ## Manual End-to-End Checklist
 
@@ -66,9 +73,9 @@ the installed Chrome channel to avoid downloading browser binaries.
 
 - Add backend unit tests for repositories and services.
 - Add frontend component tests for upload, charts, insights, jobs, and agent panels.
-- Add Playwright E2E with seeded Supabase test credentials.
-- Extend Playwright E2E beyond public smoke coverage to a seeded Supabase upload,
-  AI Q&A, and Agent workflow.
-- Add request IDs and structured JSON logs.
+- Configure GitHub Secrets for the authenticated Playwright workflow.
+- Extend authenticated Playwright coverage to dashboard saving and async job
+  polling.
+- Add structured JSON logs on top of the current request IDs.
 - Add rate limits on upload, AI, and agent endpoints.
 - Add billing, RBAC, share links, and audit logs from the roadmap.

@@ -359,6 +359,11 @@
     - Added root Playwright E2E smoke scaffold using system Chrome. `npm run e2e`
       covers public shell, login/register navigation, upload shell visibility,
       and the login form retaining input after invalid credentials.
+    - Added an optional authenticated Playwright E2E workflow gated by
+      `E2E_USER_EMAIL` and `E2E_USER_PASSWORD`. It uses a dedicated test account
+      to log in, upload `samples/sales-demo.csv`, verify parsing, generate charts,
+      ask AI Q&A, and run the controlled AI Agent. Without those credentials the
+      spec skips cleanly so CI/local smoke checks do not fail from missing secrets.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 

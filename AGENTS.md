@@ -122,6 +122,9 @@ startup project and a portfolio-grade full-stack system.
   `scripts/apply_supabase_storage_policies.py`.
 - The original 12-step roadmap is complete. Next work should harden production:
   tests, CI, billing, RBAC, sharing, and real provider credentials.
+- Playwright now has public smoke coverage plus an optional authenticated E2E
+  workflow. The authenticated workflow requires a dedicated test account via
+  `E2E_USER_EMAIL` and `E2E_USER_PASSWORD`; never commit those values.
 - The web UI should be Chinese. Keep new user-facing frontend copy in Chinese.
 - Frontend protected API calls should fetch a fresh Supabase access token through
   `getAccessToken()` before each request instead of reusing a possibly stale

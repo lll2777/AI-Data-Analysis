@@ -12,6 +12,7 @@
     "build": "npm run build --workspace @ai-data-analysis/web",
     "lint": "npm run lint --workspace @ai-data-analysis/web",
     "e2e": "playwright test",
+    "e2e:auth": "playwright test tests/e2e/authenticated-workflow.spec.ts",
     "check:env": "python scripts/check_env.py --file .env --profile development",
     "smoke:api": "conda run -n pytorch python scripts/smoke_api.py --local-testclient",
     "storage:policies": "conda run -n pytorch python scripts/apply_supabase_storage_policies.py",
