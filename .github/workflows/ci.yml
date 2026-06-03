@@ -52,3 +52,14 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright smoke
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder-key
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          PLAYWRIGHT_START_SERVER: "1"
+        run: npm run e2e:smoke

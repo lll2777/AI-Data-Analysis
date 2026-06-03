@@ -125,6 +125,9 @@ startup project and a portfolio-grade full-stack system.
 - Playwright now has public smoke coverage plus an optional authenticated E2E
   workflow. The authenticated workflow requires a dedicated test account via
   `E2E_USER_EMAIL` and `E2E_USER_PASSWORD`; never commit those values.
+- CI runs public Playwright smoke with `PLAYWRIGHT_START_SERVER=1` and bundled
+  Chromium. Authenticated E2E should remain separate until GitHub Secrets provide
+  a seeded test account.
 - The web UI should be Chinese. Keep new user-facing frontend copy in Chinese.
 - Frontend protected API calls should fetch a fresh Supabase access token through
   `getAccessToken()` before each request instead of reusing a possibly stale

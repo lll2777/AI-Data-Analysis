@@ -364,6 +364,11 @@
       to log in, upload `samples/sales-demo.csv`, verify parsing, generate charts,
       ask AI Q&A, and run the controlled AI Agent. Without those credentials the
       spec skips cleanly so CI/local smoke checks do not fail from missing secrets.
+    - GitHub Actions now runs public Playwright smoke coverage with
+      `npm run e2e:smoke`. CI sets `PLAYWRIGHT_START_SERVER=1`, starts the
+      Next.js dev server automatically, installs bundled Chromium, and keeps the
+      authenticated workflow out of CI until seeded credentials are stored in
+      GitHub Secrets.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 

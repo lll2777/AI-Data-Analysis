@@ -98,6 +98,7 @@ conda run -n pytorch python scripts/apply_supabase_storage_policies.py
 npm run format:check
 npm run lint
 npm run build
+npm run e2e:smoke
 npm run e2e
 $env:E2E_USER_EMAIL = "test@example.com"
 $env:E2E_USER_PASSWORD = "test-password"
@@ -116,6 +117,10 @@ The authenticated Playwright workflow is optional and is skipped unless
 user, not a personal account. The authenticated workflow uploads
 `samples/sales-demo.csv`, verifies parsing, generates charts, asks an AI
 question, and runs the controlled AI Agent.
+
+GitHub Actions runs `npm run e2e:smoke` on pull requests. The workflow sets
+`PLAYWRIGHT_START_SERVER=1`, starts the Next.js dev server automatically, and uses
+Playwright's bundled Chromium on Linux.
 
 ## Deployment
 

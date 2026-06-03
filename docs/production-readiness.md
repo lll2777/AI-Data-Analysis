@@ -36,6 +36,7 @@ conda run -n pytorch python scripts/apply_supabase_storage_policies.py
 npm run format:check
 npm run lint
 npm run build
+npm run e2e:smoke
 npm run e2e
 E2E_USER_EMAIL="test@example.com" E2E_USER_PASSWORD="test-password" npm run e2e:auth
 conda run -n pytorch python -m compileall apps/api/app scripts
@@ -45,6 +46,11 @@ The Playwright smoke suite uses the root `playwright.config.ts` and defaults to
 `http://127.0.0.1:3000`. Start the frontend before running `npm run e2e`, or set
 `PLAYWRIGHT_BASE_URL` to a deployed frontend URL. The local configuration uses
 the installed Chrome channel to avoid downloading browser binaries.
+
+CI runs `npm run e2e:smoke` with `PLAYWRIGHT_START_SERVER=1`, so the Next.js dev
+server starts automatically and Playwright uses bundled Chromium on Linux. Keep
+the CI smoke suite public-only until dedicated seeded credentials are stored as
+GitHub Secrets.
 
 The authenticated Playwright workflow is skipped unless `E2E_USER_EMAIL` and
 `E2E_USER_PASSWORD` are provided. Use a dedicated Supabase test user and store
@@ -73,7 +79,8 @@ question, and runs the AI Agent workflow.
 
 - Add backend unit tests for repositories and services.
 - Add frontend component tests for upload, charts, insights, jobs, and agent panels.
-- Configure GitHub Secrets for the authenticated Playwright workflow.
+- Configure GitHub Secrets for the authenticated Playwright workflow and add a
+  separate authenticated CI job.
 - Extend authenticated Playwright coverage to dashboard saving and async job
   polling.
 - Add structured JSON logs on top of the current request IDs.
