@@ -89,11 +89,57 @@ Start-Process -FilePath "D:\codex_project\tools\node-v24.16.0-win-x64\npm.cmd" `
 
 Use `samples/sales-demo.csv` for the first manual upload test.
 
+### One-Command Local Startup
+
+On the Windows workstation used for this project, start the local development
+stack with:
+
+```powershell
+npm run local:start
+```
+
+This script:
+
+- exposes the D drive Node.js runtime and npm cache;
+- starts Docker `postgres` and `redis` when Docker is available;
+- starts FastAPI at `http://127.0.0.1:8000`;
+- starts Next.js at `http://127.0.0.1:3000`;
+- runs the local health check and opens the frontend. Supabase Auth connectivity
+  is shown as a warning during startup because that external network path can be
+  unstable while local services are still usable.
+
+If you already started Docker separately, skip Docker startup with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/start-local.ps1 -SkipDocker
+```
+
+After shutting down or restarting the computer, run `npm run local:start` again.
+The development servers are ordinary local processes and do not keep running
+after a reboot.
+
+### Local Health Check
+
+When the page shows a red network warning, first run:
+
+```powershell
+npm run local:check
+```
+
+The check separates three cases:
+
+- `Backend` failed: the FastAPI server is not reachable at port `8000`.
+- `Frontend` failed: the Next.js server is not reachable at port `3000`.
+- `Supabase Auth` failed: local services may be fine, but the browser/backend
+  cannot reach Supabase Auth. Login, upload, and authenticated API calls can show
+  `Failed to fetch` until the network becomes stable again.
+
 ## Verification
 
 ```powershell
 python scripts/check_env.py --file .env.example --profile development --allow-placeholders
 python scripts/check_env.py --file .env.production.example --profile production --allow-placeholders
+npm run test:scripts
 conda run -n pytorch python scripts/smoke_api.py --local-testclient
 conda run -n pytorch python scripts/apply_supabase_storage_policies.py
 npm run format:check
@@ -133,6 +179,7 @@ See:
 
 - [docs/step-12-deployment.md](docs/step-12-deployment.md)
 - [docs/production-readiness.md](docs/production-readiness.md)
+- [docs/deployment-checklist.md](docs/deployment-checklist.md)
 - [.env.production.example](.env.production.example)
 
 ## Sharing
