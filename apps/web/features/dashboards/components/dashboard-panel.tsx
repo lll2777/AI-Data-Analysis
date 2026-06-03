@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, Loader2, Save } from "lucide-react";
+import { Copy, LayoutDashboard, Link2, Loader2, Save, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/auth-provider";
 import {
   type DashboardSummary,
+  createDashboardShareLink,
   listDashboards,
+  revokeDashboardShareLink,
   saveDashboard,
 } from "@/features/datasets/dataset-api";
 
@@ -140,6 +142,48 @@ export function DashboardPanel({
 }
 
 function DashboardRow({ dashboard }: { dashboard: DashboardSummary }) {
+  const { getAccessToken } = useAuth();
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [isRevoking, setIsRevoking] = useState(false);
+
+  async function handleShare() {
+    setIsSharing(true);
+    try {
+      const response = await createDashboardShareLink({
+        accessToken: await requireAccessToken(getAccessToken),
+        dashboardId: dashboard.id,
+      });
+      setShareUrl(response.url);
+      await copyShareUrl(response.url);
+      toast.success("分享链接已生成并复制。");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "分享链接生成失败。",
+      );
+    } finally {
+      setIsSharing(false);
+    }
+  }
+
+  async function handleRevoke() {
+    setIsRevoking(true);
+    try {
+      await revokeDashboardShareLink({
+        accessToken: await requireAccessToken(getAccessToken),
+        dashboardId: dashboard.id,
+      });
+      setShareUrl(null);
+      toast.success("分享链接已撤销。");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "分享链接撤销失败。",
+      );
+    } finally {
+      setIsRevoking(false);
+    }
+  }
+
   return (
     <article className="rounded-3xl border border-white/10 bg-white/[0.03] px-4 py-3">
       <div className="flex items-start justify-between gap-3">
@@ -155,8 +199,61 @@ function DashboardRow({ dashboard }: { dashboard: DashboardSummary }) {
           {dashboardStatusLabel(dashboard.status)}
         </span>
       </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button
+          className="h-8 px-3 text-xs"
+          disabled={isSharing}
+          onClick={() => void handleShare()}
+          type="button"
+          variant="outline"
+        >
+          {isSharing ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+          ) : shareUrl ? (
+            <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+          ) : (
+            <Link2 className="h-3.5 w-3.5" aria-hidden="true" />
+          )}
+          {shareUrl ? "复制链接" : "分享"}
+        </Button>
+        {shareUrl ? (
+          <Button
+            className="h-8 px-3 text-xs"
+            disabled={isRevoking}
+            onClick={() => void handleRevoke()}
+            type="button"
+            variant="outline"
+          >
+            {isRevoking ? (
+              <Loader2
+                className="h-3.5 w-3.5 animate-spin"
+                aria-hidden="true"
+              />
+            ) : (
+              <X className="h-3.5 w-3.5" aria-hidden="true" />
+            )}
+            撤销
+          </Button>
+        ) : null}
+      </div>
+      {shareUrl ? (
+        <p className="mt-3 break-all rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-2 text-xs leading-5 text-emerald-100">
+          {shareUrl}
+        </p>
+      ) : null}
     </article>
   );
+}
+
+async function copyShareUrl(url: string) {
+  if (!navigator.clipboard) {
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch {
+    toast.info("分享链接已生成，可手动复制。");
+  }
 }
 
 function dashboardStatusLabel(status: string) {

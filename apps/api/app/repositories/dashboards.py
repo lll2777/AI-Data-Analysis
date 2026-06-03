@@ -161,6 +161,34 @@ class DashboardRepository:
         ).mappings().first()
         return DashboardSummaryResponse(**normalize_record(row)) if row else None
 
+    def get_public(self, *, dashboard_id: str) -> DashboardSummaryResponse | None:
+        row = self.session.execute(
+            text(
+                """
+                select
+                  d.id,
+                  d.workspace_id,
+                  d.dataset_id,
+                  d.title,
+                  d.description,
+                  d.layout,
+                  d.status,
+                  d.created_at::text as created_at,
+                  d.updated_at::text as updated_at,
+                  count(di.id) filter (where di.item_type = 'chart') as chart_count,
+                  count(di.id) filter (where di.item_type = 'insight') as insight_count
+                from dashboards d
+                left join dashboard_items di on di.dashboard_id = d.id
+                where d.id = :dashboard_id
+                  and d.status = 'active'
+                group by d.id
+                limit 1
+                """,
+            ),
+            {"dashboard_id": dashboard_id},
+        ).mappings().first()
+        return DashboardSummaryResponse(**normalize_record(row)) if row else None
+
     def list_item_ids(self, *, dashboard_id: str) -> dict[str, list[str]]:
         rows = self.session.execute(
             text(

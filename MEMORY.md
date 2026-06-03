@@ -374,6 +374,11 @@
       hardening tests now cover profiler boolean/date boundaries, mixed sales
       chart recommendations, unparseable AI insight fallback, and Agent sync/async
       tool failure step recording.
+    - Public read-only dashboard sharing was added. Owners can create or revoke
+      one active share token per dashboard; public visitors open `/share/{token}`
+      without logging in and see the saved dashboard charts and insights. The
+      backend exposes private create/revoke endpoints plus a public token lookup,
+      and the frontend dashboard rows can generate/copy/revoke links.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 

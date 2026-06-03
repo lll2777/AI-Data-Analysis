@@ -116,6 +116,30 @@ class DashboardService:
             insights=selected_insights,
         )
 
+    def get_public_dashboard(self, *, dashboard_id: str) -> DashboardResponse | None:
+        summary = self.dashboard_repository.get_public(dashboard_id=dashboard_id)
+        if not summary:
+            return None
+
+        item_ids = self.dashboard_repository.list_item_ids(dashboard_id=dashboard_id)
+        charts = self.chart_repository.list_public_for_dataset(dataset_id=summary.dataset_id)
+        insights = self.insight_repository.list_public_for_dataset(dataset_id=summary.dataset_id)
+        chart_order = {item_id: index for index, item_id in enumerate(item_ids["chart"])}
+        insight_order = {item_id: index for index, item_id in enumerate(item_ids["insight"])}
+        selected_charts = sorted(
+            [chart for chart in charts if chart.id in chart_order],
+            key=lambda chart: chart_order[chart.id],
+        )
+        selected_insights = sorted(
+            [insight for insight in insights if insight.id in insight_order],
+            key=lambda insight: insight_order[insight.id],
+        )
+        return DashboardResponse(
+            **summary.model_dump(),
+            charts=selected_charts,
+            insights=selected_insights,
+        )
+
 
 def build_dashboard_layout(*, chart_count: int, insight_count: int) -> dict[str, object]:
     items = []

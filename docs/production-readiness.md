@@ -10,6 +10,7 @@
 - AI Q&A through provider adapter architecture.
 - AI insights.
 - Dashboard saving.
+- Public read-only dashboard share links.
 - Redis/Celery background jobs.
 - Controlled AI Agent workflow.
 - Vercel and Render deployment templates.
@@ -72,8 +73,9 @@ question, and runs the AI Agent workflow.
 9. Ask an AI question.
 10. Generate insights.
 11. Save dashboard.
-12. Queue a background analysis job with Redis/Celery running.
-13. Run the AI Agent.
+12. Generate a share link and open `/share/{token}` without signing in.
+13. Queue a background analysis job with Redis/Celery running.
+14. Run the AI Agent.
 
 ## Suggested Next Hardening Work
 
@@ -83,6 +85,8 @@ question, and runs the AI Agent workflow.
   separate authenticated CI job.
 - Extend authenticated Playwright coverage to dashboard saving and async job
   polling.
+- Extend authenticated Playwright coverage to share-link creation and public
+  `/share/{token}` rendering.
 - Add structured JSON logs on top of the current request IDs.
 - Add rate limits on upload, AI, and agent endpoints.
 - Add billing, RBAC, share links, and audit logs from the roadmap.
