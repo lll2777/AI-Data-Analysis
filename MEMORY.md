@@ -369,6 +369,11 @@
       Next.js dev server automatically, installs bundled Chromium, and keeps the
       authenticated workflow out of CI until seeded credentials are stored in
       GitHub Secrets.
+    - Authentication E2E helper now clears the password field immediately after
+      submit so Playwright failure snapshots do not retain E2E passwords. Backend
+      hardening tests now cover profiler boolean/date boundaries, mixed sales
+      chart recommendations, unparseable AI insight fallback, and Agent sync/async
+      tool failure step recording.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 
