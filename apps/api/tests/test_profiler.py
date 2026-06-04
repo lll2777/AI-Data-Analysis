@@ -4,6 +4,17 @@ from app.services.analysis.profiler import DatasetProfiler
 
 
 class DatasetProfilerTests(unittest.TestCase):
+    def test_large_csv_is_sampled_for_profile_but_reports_total_rows(self) -> None:
+        rows = ["city,revenue,created_at"]
+        rows.extend(f"上海,{index},2026-01-01" for index in range(6000))
+        content = "\n".join(rows).encode()
+
+        result = DatasetProfiler().analyze(content=content, filename="sample.csv")
+
+        self.assertEqual(result.row_count, 6000)
+        self.assertEqual(result.summary["sampled_row_count"], 5000)
+        self.assertTrue(result.summary["is_sampled"])
+
     def test_boolean_columns_are_not_counted_as_numeric(self) -> None:
         content = "\n".join(
             [
