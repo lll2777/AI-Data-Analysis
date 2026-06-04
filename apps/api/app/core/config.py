@@ -5,8 +5,23 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-API_ROOT = Path(__file__).resolve().parents[2]
-REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
+def find_api_root(config_file: Path) -> Path:
+    resolved = config_file.resolve()
+    if len(resolved.parents) >= 5 and resolved.parents[4].joinpath("apps", "api").exists():
+        return resolved.parents[4] / "apps" / "api"
+    return resolved.parents[2]
+
+
+def find_repository_root(config_file: Path) -> Path:
+    api_root = find_api_root(config_file)
+    for parent in [api_root, *api_root.parents]:
+        if (parent / "scripts").exists() and (parent / "infra").exists():
+            return parent
+    return api_root
+
+
+API_ROOT = find_api_root(Path(__file__))
+REPOSITORY_ROOT = find_repository_root(Path(__file__))
 
 
 class Settings(BaseSettings):

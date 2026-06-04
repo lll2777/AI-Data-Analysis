@@ -195,3 +195,7 @@ startup project and a portfolio-grade full-stack system.
   defaults in `.env.production.example` and `render.yaml` should stay aligned
   with `MIMO_BASE_URL=https://token-plan-cn.xiaomimimo.com/v1` and
   `MIMO_MODEL=mimo-v2.5`.
+- Render Docker API deploy previously failed because `app/core/config.py` assumed
+  the source file always had a deep local repository path and used
+  `Path(__file__).parents[4]`. Keep root detection compatible with both local
+  `apps/api/app/core/config.py` and Docker `/app/app/core/config.py` layouts.
