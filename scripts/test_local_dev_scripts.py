@@ -31,6 +31,21 @@ class LocalDevScriptTests(unittest.TestCase):
         self.assertIn("SUPABASE_URL", content)
         self.assertIn("auth/v1/settings", content)
 
+    def test_api_dockerfile_limits_native_analysis_threads(self) -> None:
+        dockerfile = ROOT / "infra" / "docker" / "Dockerfile.api"
+
+        self.assertTrue(dockerfile.exists(), "infra/docker/Dockerfile.api should exist")
+        content = dockerfile.read_text(encoding="utf-8")
+        for key in [
+            "PYTHONFAULTHANDLER=1",
+            "OPENBLAS_NUM_THREADS=1",
+            "OMP_NUM_THREADS=1",
+            "MKL_NUM_THREADS=1",
+            "NUMEXPR_NUM_THREADS=1",
+            "MALLOC_ARENA_MAX=2",
+        ]:
+            self.assertIn(key, content)
+
 
 if __name__ == "__main__":
     unittest.main()
