@@ -393,6 +393,21 @@
       because `/app/app/core/config.py` did not have enough parents for
       `Path(__file__).parents[4]`. Config root detection now supports both the
       local repository layout and Render Docker `/app/app/core/config.py` layout.
+    - Production deployment started using the existing Supabase project to keep
+      the MVP simple:
+      - Render API service `ai-data-analysis-api` deployed successfully at
+        `https://ai-data-analysis-api.onrender.com`; health check returned HTTP
+        200 and `{"status":"ok","service":"api"}`.
+      - Render Key Value Redis `ai-data-analysis-redis` was created. A Render
+        Background Worker was skipped because no free worker instance was
+        available, so async worker behavior remains deferred.
+      - Vercel frontend `ai-data-analysis-web` deployed successfully at
+        `https://ai-data-analysis-web-five.vercel.app`; HTTP check returned 200.
+      - Render API `CORS_ORIGINS` was changed from the placeholder Vercel URL to
+        `["https://ai-data-analysis-web-five.vercel.app"]`.
+      - Next step is manual production E2E testing on the Vercel URL: login,
+        upload, parsing, chart generation, AI Q&A, insights, dashboard saving,
+        share links, and noting any worker-dependent feature gaps.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 

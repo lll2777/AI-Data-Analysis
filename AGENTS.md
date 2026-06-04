@@ -199,3 +199,15 @@ startup project and a portfolio-grade full-stack system.
   the source file always had a deep local repository path and used
   `Path(__file__).parents[4]`. Keep root detection compatible with both local
   `apps/api/app/core/config.py` and Docker `/app/app/core/config.py` layouts.
+- Production deployment has started with existing Supabase project:
+  - Render API service `ai-data-analysis-api` is deployed at
+    `https://ai-data-analysis-api.onrender.com`; `/api/v1/health` returned 200
+    with `{"status":"ok","service":"api"}` after the Render path fix was merged.
+  - Render Key Value Redis `ai-data-analysis-redis` exists. Background Worker was
+    intentionally skipped because Render did not offer a free worker instance.
+  - Vercel frontend `ai-data-analysis-web` is deployed at
+    `https://ai-data-analysis-web-five.vercel.app` and returned HTTP 200.
+  - Render API `CORS_ORIGINS` was updated to
+    `["https://ai-data-analysis-web-five.vercel.app"]`.
+  - Next production task is manual online E2E testing: login, upload, parsing,
+    chart generation, AI Q&A, insights, dashboard save, and share link.
