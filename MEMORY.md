@@ -408,6 +408,14 @@
       - Next step is manual production E2E testing on the Vercel URL: login,
         upload, parsing, chart generation, AI Q&A, insights, dashboard saving,
         share links, and noting any worker-dependent feature gaps.
+    - Production upload testing then showed API instance crashes with Render exit
+      status 139 after `upload-session`, `confirm-upload`, and Supabase Storage
+      object download all succeeded. Small CSV uploads also triggered the crash,
+      so the issue is likely pandas/numpy native runtime behavior or resource
+      pressure in the free Docker instance, not just file size. The API Dockerfile
+      now limits OpenBLAS/OMP/MKL/NumExpr threads and enables
+      `PYTHONFAULTHANDLER=1`; if the crash persists, use the new fault logs to
+      decide between a lightweight CSV parser, async worker, or a larger instance.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 

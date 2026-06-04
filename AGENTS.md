@@ -211,3 +211,10 @@ startup project and a portfolio-grade full-stack system.
     `["https://ai-data-analysis-web-five.vercel.app"]`.
   - Next production task is manual online E2E testing: login, upload, parsing,
     chart generation, AI Q&A, insights, dashboard save, and share link.
+- During production upload testing, Render API crashed with status 139 after
+  successful upload session creation, upload confirmation, and Supabase Storage
+  download. Treat this as a native pandas/numpy runtime crash or resource issue in
+  the free Docker instance. `infra/docker/Dockerfile.api` now limits native
+  analysis threads and enables `PYTHONFAULTHANDLER=1`; if crashes continue, inspect
+  service logs for the faulthandler stack and consider a lightweight CSV parser or
+  paid/larger worker.
