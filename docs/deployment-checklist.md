@@ -29,7 +29,7 @@ SUPABASE_SERVICE_ROLE_KEY=<supabase-service-role-key>
 SUPABASE_JWT_SECRET=<supabase-jwt-secret>
 SUPABASE_JWT_AUDIENCE=authenticated
 SUPABASE_STORAGE_BUCKET=datasets
-MAX_UPLOAD_SIZE_BYTES=26214400
+MAX_UPLOAD_SIZE_BYTES=1048576
 AI_PROVIDER=mimo
 MIMO_BASE_URL=https://token-plan-cn.xiaomimimo.com/v1
 MIMO_API_KEY=<mimo-api-key>
@@ -45,7 +45,7 @@ NEXT_PUBLIC_APP_URL=https://your-vercel-app.vercel.app
 NEXT_PUBLIC_API_URL=https://your-api-host.example.com
 NEXT_PUBLIC_SUPABASE_URL=<supabase-project-url>
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<supabase-publishable-key>
-NEXT_PUBLIC_MAX_UPLOAD_SIZE_BYTES=26214400
+NEXT_PUBLIC_MAX_UPLOAD_SIZE_BYTES=1048576
 ```
 
 ## 4. Apply Database and Storage Setup
@@ -82,6 +82,9 @@ celery -A app.tasks.celery_app.celery_app worker --loglevel=info -c 2 -Q analysi
 - Sign in with a test user.
 - Upload `samples/sales-demo.csv`.
 - Confirm parsing reaches ready state.
+- On Render free instances, keep the initial public upload limit near 1 MB.
+  CSV profiling samples at most 5,000 rows while recording the real CSV row count.
+  Raise the limit only after production upload tests stay stable.
 - Generate charts.
 - Ask one AI question.
 - Generate insights.

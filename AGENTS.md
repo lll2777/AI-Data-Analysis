@@ -218,3 +218,10 @@ startup project and a portfolio-grade full-stack system.
   analysis threads and enables `PYTHONFAULTHANDLER=1`; if crashes continue, inspect
   service logs for the faulthandler stack and consider a lightweight CSV parser or
   paid/larger worker.
+- Follow-up production upload testing showed CSV files over roughly 200 KB were
+  unreliable on the Render free API. Keep the initial public upload limit
+  conservative at 1 MB (`MAX_UPLOAD_SIZE_BYTES=1048576` on Render API and
+  `NEXT_PUBLIC_MAX_UPLOAD_SIZE_BYTES=1048576` on Vercel), then raise it only after
+  repeated production tests pass. CSV profiling samples at most 5,000 rows while
+  recording the real CSV row count, and ordinary text columns should not be parsed
+  as datetimes unless their names are date/time-like.

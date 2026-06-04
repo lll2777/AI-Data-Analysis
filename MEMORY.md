@@ -416,6 +416,14 @@
       now limits OpenBLAS/OMP/MKL/NumExpr threads and enables
       `PYTHONFAULTHANDLER=1`; if the crash persists, use the new fault logs to
       decide between a lightweight CSV parser, async worker, or a larger instance.
+    - Follow-up production upload testing showed files of only a few dozen KB were
+      intermittent and CSV files above roughly 200 KB were effectively unreliable
+      on the Render free API. The profiler now samples CSV analysis to at most
+      5,000 rows while recording the real CSV row count, and avoids datetime
+      parsing on ordinary text columns unless the field name is date/time-like.
+      Keep production upload limits conservative at first:
+      `MAX_UPLOAD_SIZE_BYTES=1048576` on Render API and
+      `NEXT_PUBLIC_MAX_UPLOAD_SIZE_BYTES=1048576` on Vercel.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 

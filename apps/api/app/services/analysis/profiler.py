@@ -27,12 +27,24 @@ class DatasetAnalysisResult:
     categorical_aggregates: dict[str, Any]
 
 
+@dataclass(frozen=True)
+class DataFrameReadResult:
+    dataframe: pd.DataFrame
+    total_row_count: int
+    is_sampled: bool
+
+
+MAX_PROFILE_SAMPLE_ROWS = 5_000
+
+
 class DatasetProfiler:
     def analyze(self, *, content: bytes, filename: str) -> DatasetAnalysisResult:
-        dataframe = self._read_dataframe(content=content, filename=filename)
+        read_result = self._read_dataframe(content=content, filename=filename)
+        dataframe = read_result.dataframe
         dataframe = self._normalize_columns(dataframe)
 
-        row_count = int(len(dataframe))
+        sampled_row_count = int(len(dataframe))
+        row_count = read_result.total_row_count
         column_count = int(len(dataframe.columns))
         columns = [self._profile_column(dataframe, column) for column in dataframe.columns]
         preview_rows = sanitize_json(dataframe.head(50).to_dict(orient="records"))
@@ -46,9 +58,11 @@ class DatasetProfiler:
             summary={
                 "row_count": row_count,
                 "column_count": column_count,
+                "sampled_row_count": sampled_row_count,
+                "is_sampled": read_result.is_sampled,
                 "numeric_column_count": len(analysis_numeric_dataframe(dataframe).columns),
                 "datetime_column_count": len(dataframe.select_dtypes(include=["datetime"]).columns),
-                "duplicate_row_count": int(dataframe.duplicated().sum()) if row_count else 0,
+                "duplicate_row_count": int(dataframe.duplicated().sum()) if sampled_row_count else 0,
             },
             missing_values=self._missing_values(dataframe),
             outliers=self._outliers(dataframe),
@@ -57,14 +71,27 @@ class DatasetProfiler:
             categorical_aggregates=self._categorical_aggregates(dataframe),
         )
 
-    def _read_dataframe(self, *, content: bytes, filename: str) -> pd.DataFrame:
+    def _read_dataframe(self, *, content: bytes, filename: str) -> DataFrameReadResult:
         extension = Path(filename).suffix.lower()
         buffer = BytesIO(content)
 
         if extension == ".csv":
-            return pd.read_csv(buffer)
+            dataframe = pd.read_csv(buffer, nrows=MAX_PROFILE_SAMPLE_ROWS)
+            total_row_count = count_csv_data_rows(content)
+            sampled_row_count = int(len(dataframe))
+            return DataFrameReadResult(
+                dataframe=dataframe,
+                total_row_count=max(total_row_count, sampled_row_count),
+                is_sampled=total_row_count > sampled_row_count,
+            )
         if extension in {".xls", ".xlsx"}:
-            return pd.read_excel(buffer)
+            dataframe = pd.read_excel(buffer, nrows=MAX_PROFILE_SAMPLE_ROWS)
+            sampled_row_count = int(len(dataframe))
+            return DataFrameReadResult(
+                dataframe=dataframe,
+                total_row_count=sampled_row_count,
+                is_sampled=sampled_row_count >= MAX_PROFILE_SAMPLE_ROWS,
+            )
 
         raise ValueError("Unsupported file extension.")
 
@@ -84,7 +111,7 @@ class DatasetProfiler:
 
     def _profile_column(self, dataframe: pd.DataFrame, column: str) -> DatasetColumnProfile:
         series = dataframe[column]
-        data_type = infer_data_type(series)
+        data_type = infer_data_type(series, column)
         nullable = bool(series.isna().any())
         missing_count = int(series.isna().sum())
         unique_count = int(series.nunique(dropna=True))
@@ -195,7 +222,7 @@ class DatasetProfiler:
         result: dict[str, Any] = {}
 
         for column in dataframe.columns:
-            data_type = infer_data_type(dataframe[column])
+            data_type = infer_data_type(dataframe[column], column)
             if data_type == "datetime":
                 parsed = dataframe[column]
             elif is_datetime_like_column(column):
@@ -241,7 +268,7 @@ class DatasetProfiler:
         return result
 
 
-def infer_data_type(series: pd.Series) -> str:
+def infer_data_type(series: pd.Series, column: str | None = None) -> str:
     non_null = series.dropna()
     if non_null.empty:
         return "unknown"
@@ -258,9 +285,10 @@ def infer_data_type(series: pd.Series) -> str:
     if numeric.notna().mean() >= 0.9:
         return "integer" if (numeric.dropna() % 1 == 0).all() else "number"
 
-    parsed_dates = parse_datetime(non_null)
-    if parsed_dates.notna().mean() >= 0.9:
-        return "datetime"
+    if column is not None and is_datetime_like_column(column):
+        parsed_dates = parse_datetime(non_null)
+        if parsed_dates.notna().mean() >= 0.9:
+            return "datetime"
 
     unique_ratio = non_null.nunique(dropna=True) / len(non_null)
     return "category" if unique_ratio <= 0.2 or non_null.nunique(dropna=True) <= 50 else "string"
@@ -288,7 +316,7 @@ def parse_datetime(series: pd.Series) -> pd.Series:
 def analysis_numeric_dataframe(dataframe: pd.DataFrame) -> pd.DataFrame:
     numeric_columns: dict[str, pd.Series] = {}
     for column in dataframe.columns:
-        if infer_data_type(dataframe[column]) not in {"number", "integer"}:
+        if infer_data_type(dataframe[column], column) not in {"number", "integer"}:
             continue
         numeric = coerce_numeric(dataframe[column])
         if numeric.empty:
@@ -320,6 +348,17 @@ def is_datetime_like_column(column: str) -> bool:
             "updated_at",
         ]
     )
+
+
+def count_csv_data_rows(content: bytes) -> int:
+    if not content.strip():
+        return 0
+
+    line_count = content.count(b"\n")
+    if not content.endswith((b"\n", b"\r")):
+        line_count += 1
+
+    return max(line_count - 1, 0)
 
 
 def sanitize_float(value: Any) -> float | None:
