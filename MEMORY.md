@@ -389,6 +389,10 @@
       with `docs/deployment-checklist.md`, and production MiMo defaults in
       `.env.production.example` plus `render.yaml` were aligned to
       `https://token-plan-cn.xiaomimimo.com/v1` and `mimo-v2.5`.
+    - During the first Render API deployment, the Docker runtime crashed on import
+      because `/app/app/core/config.py` did not have enough parents for
+      `Path(__file__).parents[4]`. Config root detection now supports both the
+      local repository layout and Render Docker `/app/app/core/config.py` layout.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 
