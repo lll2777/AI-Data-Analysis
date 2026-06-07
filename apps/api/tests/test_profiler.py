@@ -12,6 +12,7 @@ class DatasetProfilerTests(unittest.TestCase):
         pyproject = Path("pyproject.toml").read_text(encoding="utf-8")
 
         self.assertIn('"openpyxl', pyproject)
+        self.assertIn('"xlrd', pyproject)
 
     def test_xlsx_files_are_parsed_with_openpyxl(self) -> None:
         workbook = Workbook()
