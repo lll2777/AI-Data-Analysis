@@ -225,3 +225,6 @@ startup project and a portfolio-grade full-stack system.
   repeated production tests pass. CSV profiling samples at most 5,000 rows while
   recording the real CSV row count, and ordinary text columns should not be parsed
   as datetimes unless their names are date/time-like.
+- Excel `.xlsx` parsing depends on `openpyxl`; keep it declared in
+  `apps/api/pyproject.toml` so Render Docker deployments install the same parser
+  dependency that the local conda environment may already have.

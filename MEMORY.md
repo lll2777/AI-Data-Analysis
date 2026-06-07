@@ -424,6 +424,12 @@
       Keep production upload limits conservative at first:
       `MAX_UPLOAD_SIZE_BYTES=1048576` on Render API and
       `NEXT_PUBLIC_MAX_UPLOAD_SIZE_BYTES=1048576` on Vercel.
+    - Production Excel upload of a tiny `.xlsx` failed with
+      `Missing optional dependency 'openpyxl'`. Root cause: local conda already
+      had `openpyxl`, but Render installs only dependencies declared in
+      `apps/api/pyproject.toml`. The API dependency list now includes
+      `openpyxl>=3.1`, and profiler tests cover both the dependency declaration
+      and `.xlsx` parsing.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 
