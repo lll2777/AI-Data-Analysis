@@ -228,3 +228,6 @@ startup project and a portfolio-grade full-stack system.
 - Excel `.xlsx` parsing depends on `openpyxl`; keep it declared in
   `apps/api/pyproject.toml` so Render Docker deployments install the same parser
   dependency that the local conda environment may already have.
+- Legacy Excel `.xls` parsing depends on `xlrd>=2.0.1`; keep both `openpyxl`
+  and `xlrd` declared because pandas uses different engines for `.xlsx` and
+  `.xls` files.

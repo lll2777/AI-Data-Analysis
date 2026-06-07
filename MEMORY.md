@@ -430,6 +430,10 @@
       `apps/api/pyproject.toml`. The API dependency list now includes
       `openpyxl>=3.1`, and profiler tests cover both the dependency declaration
       and `.xlsx` parsing.
+    - Production upload of legacy `.xls` files then failed with
+      `Missing optional dependency 'xlrd'`. The API dependency list now includes
+      `xlrd>=2.0.1`; keep it alongside `openpyxl` because pandas uses separate
+      Excel engines for `.xls` and `.xlsx`.
   - Do not expose or commit local secrets. Local ignored files now include root
     `.env` and `apps/web/.env.local`.
 
