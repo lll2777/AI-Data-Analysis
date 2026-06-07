@@ -1,9 +1,35 @@
 import unittest
+from io import BytesIO
+from pathlib import Path
+
+from openpyxl import Workbook
 
 from app.services.analysis.profiler import DatasetProfiler
 
 
 class DatasetProfilerTests(unittest.TestCase):
+    def test_excel_parser_dependency_is_declared_for_production(self) -> None:
+        pyproject = Path("pyproject.toml").read_text(encoding="utf-8")
+
+        self.assertIn('"openpyxl', pyproject)
+
+    def test_xlsx_files_are_parsed_with_openpyxl(self) -> None:
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.append(["日期", "收入"])
+        sheet.append(["2026-01-01", 100])
+        sheet.append(["2026-01-02", 120])
+        buffer = BytesIO()
+        workbook.save(buffer)
+
+        result = DatasetProfiler().analyze(
+            content=buffer.getvalue(),
+            filename="sample.xlsx",
+        )
+
+        self.assertEqual(result.row_count, 2)
+        self.assertEqual(result.column_count, 2)
+
     def test_large_csv_is_sampled_for_profile_but_reports_total_rows(self) -> None:
         rows = ["city,revenue,created_at"]
         rows.extend(f"上海,{index},2026-01-01" for index in range(6000))
